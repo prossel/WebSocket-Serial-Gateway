@@ -22,53 +22,75 @@ ws_port = 8765
 
 async def serial_task(ser, websocket):
     print("Serial handler started")
-    while True:
-        
-        # Get waiting data from serial port
-        if ser.in_waiting:
-            data = ser.read(ser.in_waiting).decode('utf-8')
-            print(f'Received from serial port: {data}')
-            await websocket.send(data)
+    try:
+        while True:
+            
+            # Get waiting data from serial port
+            if ser.in_waiting:
+                data = ser.read(ser.in_waiting).decode('utf-8')
+                print(f'Received from serial port: {data}')
+                await websocket.send(data)
 
-        # let other tasks run
-        await asyncio.sleep(0.001)
-        
-        # print("Serial handler running") 
-        
+            # let other tasks run
+            await asyncio.sleep(0.001)
+            
+            # print("Serial handler running") 
+    except asyncio.CancelledError:
+        print("Serial handler cancelled")
+        return
+    except Exception as e:
+        print(f"Serial handler error: {e}")
+        return
 
 async def websocket_handler(websocket, path):
     
-    # Ouvrir le port série
-    ser = serial.Serial(ser_port, ser_baudrate)
-    print(f'Port série ouvert sur {ser_port} à {ser_baudrate} bauds')
+    while websocket.open:
 
-    # Start the serial handler
-    taskSerial = asyncio.create_task(serial_task(ser, websocket))
-
-    while True:
-        # print('.', end='', flush=True)
-        
-        # get any message from websocket
+        # Ouvrir le port série
         try:
-            message = await websocket.recv()
+            ser = serial.Serial(ser_port, ser_baudrate)
+            print(f'Port série ouvert sur {ser_port} à {ser_baudrate} bauds')
+        except serial.SerialException as e:
+            print(f"Erreur d'ouverture du port série: {e}")
+            # wait 2 seconds before retrying
+            await asyncio.sleep(2)
+            continue
 
-            print(f'Received from websocket: {message}')
-            ser.write(message.encode('utf-8'))
+        # Start the serial handler
+        taskSerial = asyncio.create_task(serial_task(ser, websocket))
+                
+        # Attendre les messages du websocket
+        while True:
+            # print('.', end='', flush=True)
             
-        except websockets.exceptions.ConnectionClosedOK:
-            break
-        except websockets.exceptions.ConnectionClosedError:
-            break
-        
-    # Stop the serial handler
-    print("Candelling serial task")
-    taskSerial.cancel()
+            # get any message from websocket
+            try:
+                print("Waiting for message from websocket...")
+                message = await websocket.recv()
 
-    # Close the serial port
-    print("Closing serial port")
-    ser.close()
+                print(f'... received from websocket: {message}')
+                ser.write(message.encode('utf-8'))
+            
+            # seriaException
+            except serial.SerialException as e:
+                print(f"Serial error: {e}")
+                break
+            except websockets.exceptions.ConnectionClosedOK:
+                break
+            except websockets.exceptions.ConnectionClosedError:
+                break
+            
+        # Stop the serial handler
+        print("Candelling serial task")
+        taskSerial.cancel()
+
+        # Close the serial port
+        print("Closing serial port")
+        ser.close()
      
-
+    print("Websocket handler ended")
+    
+# Start the websocket server
 start_server = websockets.serve(websocket_handler, ws_host, ws_port)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
