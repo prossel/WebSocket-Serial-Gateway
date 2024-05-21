@@ -1,3 +1,13 @@
+# Websocket server that forwards messages between a serial port and a websocket client
+# The serial port is opened when a websocket client connects and closed when the client disconnects
+# The serial port is read in a separate task to avoid blocking the websocket handler
+
+# Usage: python3 gateway.py
+# Usage dev: nodemon --exec python3 gateway.py
+
+# 2024-05-21 - Pierre Rossel - Initial version
+
+
 import asyncio
 import websockets
 import serial
