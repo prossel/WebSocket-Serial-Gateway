@@ -1,6 +1,6 @@
-# Websocket server that forwards messages between a serial port and a websocket client
-# The serial port is opened when a websocket client connects and closed when the client disconnects
-# The serial port is read in a separate task to avoid blocking the websocket handler
+# WebSocket server that forwards messages between a serial port and a WebSocket client
+# The serial port is opened when a WebSocket client connects and closed when the client disconnects
+# The serial port is read in a separate task to avoid blocking the WebSocket handler
 
 # install modules
 # pip3 install websockets pyserial
@@ -10,6 +10,10 @@
 
 # Test with https://editor.p5js.org/prossel/sketches/fxODyCmxV
 
+# Original repository:
+# https://github.com/prossel/WebSocket-Serial-Gateway
+
+# History:
 # 2024-05-21 - Pierre Rossel - Initial version
 
 
@@ -17,12 +21,11 @@ import asyncio
 import websockets
 import serial
 
-# Paramètres du port série
-# ser_port = '/dev/tty.usbmodem2101'
+# Serial port configuration
 ser_port = '/dev/tty.usbmodem101'
 ser_baudrate = 115200
 
-# Paramètres du websocket
+# WebSocket configuration
 ws_host = 'localhost'
 ws_port = 8765
 
@@ -52,12 +55,12 @@ async def websocket_handler(websocket, path):
     
     while websocket.open:
 
-        # Ouvrir le port série
+        # Open the serial port
         try:
             ser = serial.Serial(ser_port, ser_baudrate)
-            print(f'Port série ouvert sur {ser_port} à {ser_baudrate} bauds')
+            print(f'Serial port open on {ser_port} at {ser_baudrate} bauds')
         except serial.SerialException as e:
-            print(f"Erreur d'ouverture du port série: {e}")
+            print(f"Serial port open error: {e}")
             # wait 2 seconds before retrying
             await asyncio.sleep(2)
             continue
@@ -65,16 +68,16 @@ async def websocket_handler(websocket, path):
         # Start the serial handler
         taskSerial = asyncio.create_task(serial_task(ser, websocket))
                 
-        # Attendre les messages du websocket
+        # Wait for WebSocket messages
         while True:
             # print('.', end='', flush=True)
             
-            # get any message from websocket
+            # get any message from WebSocket
             try:
-                print("Waiting for message from websocket...")
+                print("Waiting for message from WebSocket...")
                 message = await websocket.recv()
 
-                print(f'... received from websocket: {message}')
+                print(f'... received from WebSocket: {message}')
                 ser.write(message.encode('utf-8'))
             
             # seriaException
@@ -94,9 +97,9 @@ async def websocket_handler(websocket, path):
         print("Closing serial port")
         ser.close()
      
-    print("Websocket handler ended")
+    print("WebSocket handler ended")
     
-# Start the websocket server
+# Start the WebSocket server
 start_server = websockets.serve(websocket_handler, ws_host, ws_port)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
