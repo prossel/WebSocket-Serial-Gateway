@@ -2,8 +2,13 @@
 # The serial port is opened when a websocket client connects and closed when the client disconnects
 # The serial port is read in a separate task to avoid blocking the websocket handler
 
+# install modules
+# pip3 install websockets pyserial
+
 # Usage: python3 gateway.py
 # Usage dev: nodemon --exec python3 gateway.py
+
+# Test with https://editor.p5js.org/prossel/sketches/fxODyCmxV
 
 # 2024-05-21 - Pierre Rossel - Initial version
 
@@ -13,8 +18,9 @@ import websockets
 import serial
 
 # Paramètres du port série
-ser_port = '/dev/tty.usbmodem2101'
-ser_baudrate = 9600
+# ser_port = '/dev/tty.usbmodem2101'
+ser_port = '/dev/tty.usbmodem101'
+ser_baudrate = 115200
 
 # Paramètres du websocket
 ws_host = 'localhost'
