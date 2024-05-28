@@ -99,7 +99,10 @@ async def websocket_handler(websocket, path):
      
     print("WebSocket handler ended")
     
-# Start the WebSocket server
-start_server = websockets.serve(websocket_handler, ws_host, ws_port)
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
+try:
+    # Start the WebSocket server
+    start_server = websockets.serve(websocket_handler, ws_host, ws_port)
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()
+except KeyboardInterrupt:
+    print(" Received exit signal in loop, stopping...")
