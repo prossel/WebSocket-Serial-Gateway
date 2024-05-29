@@ -94,6 +94,6 @@ The initial version is enough for the project that initiated it. However it woul
 - [ ] Set the configuration from an external file (gitignored)
 - [x] Serial configuration controlled by the WebSocket client
 - [x] Get the list of available serial ports through WebSocket
-- ...
+- [ ] ...
 
 Don't hesitate to send your pull requests.
