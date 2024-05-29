@@ -17,6 +17,8 @@
 # History:
 # 2024-05-21 - Pierre Rossel - Initial version
 # 2024-05-29 - Pierre Rossel - Added serial port listing, command line parameters and path parameters
+#                              Display the list of available serial ports at startup
+#                              Use last available port if /last is specified as serial port
 
 
 import asyncio
@@ -83,7 +85,12 @@ async def websocket_handler(websocket, path):
             ser_port = parts[0]
         if len(parts) > 1 and len(parts[1]) > 0:
             ser_baudrate = int(parts[1])
-                
+    
+    # special case: port /last will use last available port
+    if ser_port == "/last":
+        ports = list_ports.comports()
+        ser_port = ports[-1].device
+    
     print("Waiting for port " + ser_port + " at " + str(ser_baudrate) + " bauds")
     
     while websocket.open:
@@ -143,10 +150,18 @@ if len(sys.argv) > 3:
     ws_host = sys.argv[3]
 if len(sys.argv) > 4:
     ws_port = int(sys.argv[4])
-    
-print(f"Serial port: {ser_port} at {ser_baudrate} bauds")
-print(f"WebSocket server: {ws_host}:{ws_port}")
 
+print("WebSocket Serial Gateway started")
+print("Parameters:")
+print(f"  Serial port: {ser_port} at {ser_baudrate} bauds")
+print(f"  WebSocket server: {ws_host}:{ws_port}")
+
+print("Serial ports available:")
+ports = list_ports.comports()
+for port in ports:
+    print("  " + port.device)
+
+print("Waiting for WebSocket connections...")
     
 try:
     # Start the WebSocket server
