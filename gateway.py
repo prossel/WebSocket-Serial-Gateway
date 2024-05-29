@@ -27,7 +27,7 @@ import serial
 from serial.tools import list_ports
 
 # Serial port configuration
-ser_port = '/dev/tty.usbmodem101'
+ser_port = '/last'
 ser_baudrate = 115200
 
 # WebSocket configuration

@@ -31,7 +31,13 @@ The serial port and baud rate can be given in the path when creating the WebSock
 socket = new WebSocket("ws://localhost:8765/[device][@baudrate]");
 ```
 
-To get the list of available serial ports, use /list in the path. The server will send the list of devices and close the connection.
+To automatically use the last serial port available, use /last for the device name.
+
+```js
+socket = new WebSocket("ws://localhost:8765/last@9600");
+```
+
+To get the list of available serial ports, use /list for the device name. The server will send the list of devices and close the connection.
 
 ```js
 socket = new WebSocket("ws://localhost:8765/list");
@@ -66,6 +72,14 @@ python3 gateway.py [device] [baudrate] [host] [port]
 python3 gateway.py /dev/cu.usbmodem101 9600 localhost 8765
 ```
 
+Special device values
+
+/list
+: Server sends the list of available serial port devices and closes the connection
+
+/last
+: Use the last available serial port device. Usually it's the lastly connected.
+
 ### Development
 
 Use nodemon to restart the server when the script is modified.
@@ -88,8 +102,8 @@ https://editor.p5js.org/prossel/sketches/zTU-rAJM6
 
 The initial version is enough for the project that initiated it. However it would be nice to further improve it to make it more generic.
 
-- [ ] Auto detect last serial port
-- [ ] Support a list of possible serial port
+- [x] Auto detect last serial port
+- [ ] Support a list of possible serial port or wildcard or regexp
 - [x] Set the configuration from the command line
 - [ ] Set the configuration from an external file (gitignored)
 - [x] Serial configuration controlled by the WebSocket client
