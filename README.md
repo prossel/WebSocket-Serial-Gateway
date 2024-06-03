@@ -1,5 +1,7 @@
 # WebSocket Serial Gateway
 
+![alt text](<images/websocket serial port gateway illustration.jpeg>)
+
 This python script is a gateway between a WebSocket client and a serial port.
 
 Example usage: Easy connection between a web page (any browser) and a serial port (no security warning)
